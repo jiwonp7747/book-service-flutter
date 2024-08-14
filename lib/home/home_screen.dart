@@ -1,3 +1,4 @@
+import 'package:book_service_flutter/home/widget/market_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,9 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: IndexedStack(
         index: _menuIndex,
         children: [
-          Container(
-            color: Colors.red,
-          ),
+          MarketScreen(),
           Container(
             color: Colors.blue,
           )
@@ -42,14 +41,26 @@ class _HomeScreenState extends State<HomeScreen> {
             _menuIndex = idx;
           });
         },
-        destinations: [
+        destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.store_outlined),
+            icon: Icon(Icons.home),
             label: "홈",
           ),
           NavigationDestination(
-            icon: Icon(Icons.storefront),
-            label: "판매자",
+            icon: Icon(Icons.chat),
+            label: "채팅",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.grid_on),
+            label: "게시판",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.diamond),
+            label: "추천",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person),
+            label: "정보",
           ),
         ],
       ),
