@@ -1,4 +1,5 @@
 import 'package:book_service_flutter/home/widget/market_screen.dart';
+import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,9 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _menuIndex,
         children: [
           MarketScreen(),
-          Container(
-            color: Colors.blue,
-          )
+          SellBookScreen(),
           //HomeWidget(), // index : 0
           //SellerWidget(),
         ],

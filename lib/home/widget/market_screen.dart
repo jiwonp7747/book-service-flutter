@@ -1,3 +1,4 @@
+import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -28,6 +29,10 @@ class _MarketScreenState extends State<MarketScreen> {
     }
   }
 
+  Future<void> refreshPosts() async {
+    // 새로운 데이터를 가져오기 위해 fetchPosts를 호출하여 상태를 업데이트합니다.
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,58 +80,64 @@ class _MarketScreenState extends State<MarketScreen> {
                   fillColor: Colors.grey[200]),
             ),
           ),
+          
           Expanded(
-            child: FutureBuilder<List<Post>>(
-              future: fetchPosts(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No posts available.'));
-                } else {
-                  return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      final post = snapshot.data![index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ), // RoundedRectangleBorder의 닫는 괄호
-                          child: ListTile(
-                            leading: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
+            child: RefreshIndicator(
+              onRefresh: refreshPosts,
+              child: FutureBuilder<List<Post>>(
+                future: fetchPosts(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No posts available.'));
+                  } else {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final post = snapshot.data![index];
+                        return SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
-                              ), // BoxDecoration의 닫는 괄호
-                            ), // Container의 닫는 괄호
-                            title: Text(
-                              post.title,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ), // Text의 닫는 괄호
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(post.title),
-                                SizedBox(height: 4),
-                                Text(
-                                  post.content,
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              ), // RoundedRectangleBorder의 닫는 괄호
+                              child: ListTile(
+                                leading: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(10),
+                                  ), // BoxDecoration의 닫는 괄호
+                                ), // Container의 닫는 괄호
+                                title: Text(
+                                  post.title,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ), // Text의 닫는 괄호
-                              ], // Column의 children 닫는 괄호
-                            ), // Column의 닫는 괄호
-                          ), // ListTile의 닫는 괄호
-                        ), // Card의 닫는 괄호
-                      ); // Padding의 닫는 괄호
-                    }, // ListView.builder의 itemBuilder 닫는 괄호
-                  ); // ListView.builder의 닫는 괄호
-                } // if-else 닫는 괄호
-              }, // FutureBuilder의 builder 닫는 괄호
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(post.title),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      post.content,
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    ), // Text의 닫는 괄호
+                                  ], // Column의 children 닫는 괄호
+                                ), // Column의 닫는 괄호
+                              ), // ListTile의 닫는 괄호
+                            ), // Card의 닫는 괄호
+                          ),
+                        ); // Padding의 닫는 괄호
+                      }, // ListView.builder의 itemBuilder 닫는 괄호
+                    ); // ListView.builder의 닫는 괄호
+                  } // if-else 닫는 괄호
+                }, // FutureBuilder의 builder 닫는 괄호
+              ),
             ), // FutureBuilder의 닫는 괄호
           ), // Expanded의 닫는 괄호
         ],
@@ -134,7 +145,12 @@ class _MarketScreenState extends State<MarketScreen> {
 
 
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context)=>const SellBookScreen()),
+          );
+        },
         label: Text('글쓰기'),
         icon: Icon(Icons.edit),
         backgroundColor: Colors.teal,
