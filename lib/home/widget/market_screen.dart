@@ -112,7 +112,21 @@ class _MarketScreenState extends State<MarketScreen> {
                                   decoration: BoxDecoration(
                                     color: Colors.grey[300],
                                     borderRadius: BorderRadius.circular(10),
+                                    image: post.imageUrl != null && post.imageUrl.isNotEmpty
+                                        ? DecorationImage(
+                                      image: NetworkImage("http://192.168.0.11:8080/"+post.imageUrl), // 네트워크에서 이미지를 로드
+                                      fit: BoxFit.cover, // 이미지를 Container의 크기에 맞게 조정
+                                    )
+                                        : null, // 이미지가 없으면 DecorationImage를 null로 설
                                   ), // BoxDecoration의 닫는 괄호
+
+                                  child: post.imageUrl == null || post.imageUrl.isEmpty
+                                      ? Icon(
+                                    Icons.image,
+                                    size: 30,
+                                    color: Colors.grey[700], // 기본 아이콘 색상
+                                  )
+                                      : null, // 이미지가 있으면 아이콘을 표시하지 않음
                                 ), // Container의 닫는 괄호
                                 title: Text(
                                   post.title,
