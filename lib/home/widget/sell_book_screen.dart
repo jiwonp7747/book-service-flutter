@@ -14,8 +14,9 @@ class SellBookScreen extends StatefulWidget {
 }
 
 class _SellBookScreenState extends State<SellBookScreen> {
-  File? image;
+  //File? image;
   final ImagePicker picker=ImagePicker();
+  List<XFile?> _images = List<XFile?>.filled(3, null);
 
   final _formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
@@ -29,17 +30,32 @@ class _SellBookScreenState extends State<SellBookScreen> {
       final String content = contentController.text;
 
       try {
-        final response = await http.post(
-            Uri.parse('http://192.168.0.11:8080/api/post/register'),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-            body: jsonEncode(<String, String>{
-              'post_type':"PURCHASE",
-              'title': title,
-              'price': price,
-              'content': content
-            }));
+       var uri=Uri.parse('http://192.168.0.11:8080/api/post/register');
+       var request=http.MultipartRequest('Post', uri);
+
+       // 요청 헤더 추가
+       request.headers.addAll({
+         'Content-Type': 'multipart/form-data'
+         //'Authorization'
+       });
+
+       // 요청 이미지 추가
+       for (var image in _images) {
+         if (image != null) {
+           request.files.add(await http.MultipartFile.fromPath('files', image.path));
+           print(image.path);
+         }
+       }
+
+       // 텍스트 필드 추가
+       request.fields['postType']="PURCHASE";
+       request.fields['title']=title;
+       request.fields['price']=price;
+       request.fields['content']=content;
+       request.fields['userId']="1"; //TODO 실제 userId로 변경 필요
+
+       // 요청 전송
+       var response=await request.send();
 
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -60,12 +76,13 @@ class _SellBookScreenState extends State<SellBookScreen> {
     }
   }
 
-  Future<void> _pickImage() async { // 갤러리에서 이미지 선택
+  // 이미지 선택 기능(모바일)
+  Future<void> pickImage(int index) async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
-        image = File(pickedFile.path);
+        // _images.add(File(pickedFile.path));
+        _images[index] = pickedFile;
       });
     }
   }
@@ -89,7 +106,7 @@ class _SellBookScreenState extends State<SellBookScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: _pickImage,
+                onTap: ()=>pickImage(0),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -102,7 +119,7 @@ class _SellBookScreenState extends State<SellBookScreen> {
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: image==null ? const Column(
+                  child: _images[0]==null ? const Column(
                     children: [
                       Icon(
                         Icons.camera_alt,
@@ -112,7 +129,7 @@ class _SellBookScreenState extends State<SellBookScreen> {
                       Text('0/10'),
                     ],
                   ) : Image.file( // image 가 null이 아니면
-                    image!,
+                    File(_images[0]!.path),
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
