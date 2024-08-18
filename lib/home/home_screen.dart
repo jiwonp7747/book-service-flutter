@@ -1,3 +1,4 @@
+import 'package:book_service_flutter/login/login_service.dart';
 import 'package:book_service_flutter/home/widget/market_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,17 +18,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: Text(""),
         centerTitle: true,
 
-      ),
-
+      ),*/
       body: IndexedStack(
         index: _menuIndex,
         children: [
           MarketScreen(),
           SellBookScreen(),
+          LoginService(),
           //HomeWidget(), // index : 0
           //SellerWidget(),
         ],

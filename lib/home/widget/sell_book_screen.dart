@@ -61,6 +61,7 @@ class _SellBookScreenState extends State<SellBookScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('책이 성공적으로 등록되었습니다.')),
           );
+          Navigator.pop(context, true);
         } else {
           // 오류 처리
           ScaffoldMessenger.of(context).showSnackBar(
