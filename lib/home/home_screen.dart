@@ -1,6 +1,7 @@
 import 'package:book_service_flutter/login/login_service.dart';
 import 'package:book_service_flutter/home/widget/market_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
+import 'package:book_service_flutter/profile/user_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
           MarketScreen(),
           SellBookScreen(),
           LoginService(),
+          LoginService(),
+          UserProfileScreen(),
           //HomeWidget(), // index : 0
           //SellerWidget(),
         ],

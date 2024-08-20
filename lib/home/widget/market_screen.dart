@@ -1,3 +1,4 @@
+import 'package:book_service_flutter/config/config.dart';
 import 'package:book_service_flutter/home/widget/book_detail_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class _MarketScreenState extends State<MarketScreen> {
 
   Future<List<Post>> fetchPosts() async {
     final response = await http.get(
-        Uri.parse('http://192.168.0.11:8080/api/post/get-list'),
+        Uri.parse('${Config.baseUrl}/api/post/get-list'),
         headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -119,6 +120,7 @@ class _MarketScreenState extends State<MarketScreen> {
                             child: GestureDetector(
                               onTap: (){
                                 print("카드가 눌렸습니다."+post.title);
+                                print("카드가 눌렸습니다. ${Config.accessToken}");
                                 Navigator.push(context,
                                   MaterialPageRoute(builder: (context)=>BookDetailScreen(post: post,))
                                 );
@@ -137,7 +139,7 @@ class _MarketScreenState extends State<MarketScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                       image: post.imageUrl != null && post.imageUrl.isNotEmpty
                                           ? DecorationImage(
-                                        image: NetworkImage("http://192.168.0.11:8080/"+post.imageUrl), // 네트워크에서 이미지를 로드
+                                        image: NetworkImage(Config.baseUrl+post.imageUrl), // 네트워크에서 이미지를 로드
                                         fit: BoxFit.cover, // 이미지를 Container의 크기에 맞게 조정
                                       )
                                           : null, // 이미지가 없으면 DecorationImage를 null로 설

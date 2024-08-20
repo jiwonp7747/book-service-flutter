@@ -1,6 +1,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/flutter,android,dart,androidstudio,visualstudiocode,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=flutter,android,dart,androidstudio,visualstudiocode,macos
 
+lib/config/config.dart
 ### Android ###
 # Gradle files
 .gradle/

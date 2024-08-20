@@ -1,3 +1,4 @@
+import 'package:book_service_flutter/config/config.dart';
 import 'package:book_service_flutter/login/register_success.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -26,7 +27,7 @@ class _RegisterUserState extends State<RegisterUser> {
       final String password = _passwordController.text;
 
       try {
-        var uri=Uri.parse('http://192.168.0.11:8080/api/user');
+        var uri=Uri.parse('${Config.baseUrl}/api/user');
         // JSON 데이터 준비
         var body = jsonEncode({
           'email': email,
