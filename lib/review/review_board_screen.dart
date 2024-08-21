@@ -1,27 +1,25 @@
 import 'package:book_service_flutter/config/config.dart';
+import 'package:book_service_flutter/home/class/post.dart';
 import 'package:book_service_flutter/home/widget/book_detail_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
-import 'package:book_service_flutter/home/widget/setting_deal_range.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:book_service_flutter/home/class/post.dart';
+import "dart:convert";
 
-class MarketScreen extends StatefulWidget {
-  const MarketScreen({super.key});
+class ReviewBoardScreen extends StatefulWidget {
+  const ReviewBoardScreen({super.key});
 
   @override
-  State<MarketScreen> createState() => _MarketScreenState();
+  State<ReviewBoardScreen> createState() => _ReviewBoardScreenState();
 }
 
-class _MarketScreenState extends State<MarketScreen> {
-
+class _ReviewBoardScreenState extends State<ReviewBoardScreen> {
   Future<List<Post>> fetchPosts() async {
     final response = await http.get(
-        Uri.parse('${Config.baseUrl}/api/post/get-list'),
-        headers: <String, String>{
+      Uri.parse('${Config.baseUrl}/api/post/get-list'),
+      headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-          'authorization-token': Config.accessToken,
+        'authorization-token': Config.accessToken,
       },
     );
 
@@ -50,7 +48,7 @@ class _MarketScreenState extends State<MarketScreen> {
               height: 8,
             ),
             Text(
-              'BOOKSWAP',
+              '리뷰 게시판',
               style: TextStyle(
                   color: Colors.teal[700],
                   fontSize: 24,
@@ -58,26 +56,7 @@ class _MarketScreenState extends State<MarketScreen> {
             ),
           ],
         ),
-        actions: [
-          GestureDetector(
-            child: Row(
-              children: [
-                Icon(Icons.settings,
-                color: Colors.grey,),
-                Text(" 범위 설정",
-                style: TextStyle(
 
-                ),),
-                SizedBox(width: 16,),
-              ],
-            ),
-            onTap: () async{
-              final resultRange= await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context)=>const SettingDealRange()));
-            },
-          )
-        ],
         toolbarHeight: 80,
       ),
 
@@ -121,7 +100,7 @@ class _MarketScreenState extends State<MarketScreen> {
                                 print("카드가 눌렸습니다."+post.title);
                                 print("카드가 눌렸습니다. ${Config.accessToken}");
                                 Navigator.push(context,
-                                  MaterialPageRoute(builder: (context)=>BookDetailScreen(post: post,))
+                                    MaterialPageRoute(builder: (context)=>BookDetailScreen(post: post,))
                                 );
                               }, //TODO 카드를 눌렀을 때 상세페이지
                               child: Card( //TODO 카드 사이즈 조절
@@ -130,7 +109,6 @@ class _MarketScreenState extends State<MarketScreen> {
                                   borderRadius: BorderRadius.circular(10),
                                 ), // RoundedRectangleBorder의 닫는 괄호
                                 child: ListTile(
-                                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                   leading: Container(
                                     width: 60,
                                     height: 60,
@@ -185,24 +163,22 @@ class _MarketScreenState extends State<MarketScreen> {
         ],
       ),
 
-
       floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'homeTag1',
         onPressed: () async {
           final result= await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context)=>const SellBookScreen()),
+            context,
+            MaterialPageRoute(builder: (context)=>const SellBookScreen()),
           );
           //글이 성공적으로 등록되었으면
           if(result==true){
-            print("이미지 게시 성공입니다.");
+            print("리뷰글 게시 성공입니다.");
             refreshPosts();
           }
         },
         label: Text('글쓰기',
           style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold
+              color: Colors.white,
+              fontWeight: FontWeight.bold
           ),
         ),
         icon: Icon(Icons.edit, color: Colors.white,),

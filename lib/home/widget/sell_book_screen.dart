@@ -1,4 +1,5 @@
 
+import 'package:book_service_flutter/config/config.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -30,12 +31,13 @@ class _SellBookScreenState extends State<SellBookScreen> {
       final String content = contentController.text;
 
       try {
-       var uri=Uri.parse('http://192.168.0.11:8080/api/post/register');
+       var uri=Uri.parse('${Config.baseUrl}/api/post/register');
        var request=http.MultipartRequest('Post', uri);
 
        // 요청 헤더 추가
        request.headers.addAll({
-         'Content-Type': 'multipart/form-data'
+         'Content-Type': 'multipart/form-data',
+         'authorization-token': Config.accessToken,
          //'Authorization'
        });
 

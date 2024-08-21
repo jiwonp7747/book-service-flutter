@@ -1,3 +1,4 @@
+import 'package:book_service_flutter/config/config.dart';
 import 'package:book_service_flutter/home/class/post.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +61,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 decoration: BoxDecoration(
                     image: DecorationImage(
                   image: NetworkImage(
-                      "http://192.168.0.11:8080/" + widget.post.imageUrl),
+                      Config.baseUrl + widget.post.imageUrl),
                   fit: BoxFit.cover,
                 )),
               ),
