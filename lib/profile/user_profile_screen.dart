@@ -29,7 +29,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   }
 
   Future<Map<String, dynamic>> _fetchUserProfile() async {
-    final url = Uri.parse('${Config.baseUrl}/api/user?id=2'); // 서버 URL 변경
+    final url = Uri.parse('${Config.baseUrl}/api/user'); // 서버 URL 변경
     try {
       final response = await http.get(
         url,
@@ -45,16 +45,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         return jsonDecode(utf8.decode(response.bodyBytes));
       } else {
         // 서버로부터의 응답이 오류인 경우 처리
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('프로필 정보를 가져오지 못했습니다.')),
-        );
         throw Exception('Failed to load profile data'); // 오류 발생 시 예외 던짐
       }
     } catch (e) {
       // 네트워크 또는 기타 오류 처리
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('오류 발생: $e')),
-      );
       throw Exception('Failed to load profile data'); // 오류 발생 시 예외 던짐
     }
   }

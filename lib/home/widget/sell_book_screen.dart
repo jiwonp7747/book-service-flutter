@@ -36,7 +36,8 @@ class _SellBookScreenState extends State<SellBookScreen> {
 
        // 요청 헤더 추가
        request.headers.addAll({
-         'Content-Type': 'multipart/form-data'
+         'Content-Type': 'multipart/form-data',
+         'authorization-token': Config.accessToken,
          //'Authorization'
        });
 

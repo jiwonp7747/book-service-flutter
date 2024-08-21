@@ -27,7 +27,7 @@ class _RegisterUserState extends State<RegisterUser> {
       final String password = _passwordController.text;
 
       try {
-        var uri=Uri.parse('${Config.baseUrl}/api/user');
+        var uri=Uri.parse('${Config.baseUrl}/open-api/user');
         // JSON 데이터 준비
         var body = jsonEncode({
           'email': email,

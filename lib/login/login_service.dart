@@ -26,7 +26,7 @@ class _LoginServiceState extends State<LoginService> {
 
       try {
         // 서버에 로그인 요청 보내기
-        var url = Uri.parse('${Config.baseUrl}/api/user/login'); // 실제 서버 URL로 변경
+        var url = Uri.parse('${Config.baseUrl}/open-api/user/login'); // 실제 서버 URL로 변경
         var response = await http.post(
           url,
           headers: {'Content-Type': 'application/json'},
