@@ -2,6 +2,7 @@ import 'package:book_service_flutter/config/config.dart';
 import 'package:book_service_flutter/home/class/post.dart';
 import 'package:book_service_flutter/home/widget/book_detail_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import "dart:convert";
@@ -109,27 +110,22 @@ class _ReviewBoardScreenState extends State<ReviewBoardScreen> {
                                   borderRadius: BorderRadius.circular(10),
                                 ), // RoundedRectangleBorder의 닫는 괄호
                                 child: ListTile(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                   leading: Container(
                                     width: 60,
                                     height: 60,
                                     decoration: BoxDecoration( // 책 이미지
                                       color: Colors.grey[300],
                                       borderRadius: BorderRadius.circular(10),
-                                      image: post.imageUrl != null && post.imageUrl.isNotEmpty
-                                          ? DecorationImage(
-                                        image: NetworkImage(Config.baseUrl+post.imageUrl), // 네트워크에서 이미지를 로드
-                                        fit: BoxFit.cover, // 이미지를 Container의 크기에 맞게 조정
-                                      )
-                                          : null, // 이미지가 없으면 DecorationImage를 null로 설
                                     ), // BoxDecoration의 닫는 괄호
 
-                                    child: post.imageUrl == null || post.imageUrl.isEmpty
-                                        ? Icon(
+                                    child: post.imageUrl != null && post.imageUrl.isNotEmpty
+                                        ? _buildNetworkImage(post.imageUrl)
+                                        : Icon(
                                       Icons.image,
                                       size: 30,
-                                      color: Colors.grey[700], // 기본 아이콘 색상
-                                    )
-                                        : null, // 이미지가 있으면 아이콘을 표시하지 않음
+                                      color: Colors.grey[700],
+                                    ),
                                   ), // Container의 닫는 괄호
                                   title: Text(
                                     post.title,
@@ -184,6 +180,29 @@ class _ReviewBoardScreenState extends State<ReviewBoardScreen> {
         icon: Icon(Icons.edit, color: Colors.white,),
         backgroundColor: Colors.teal,
       ),
+    );
+  }
+
+  Widget _buildNetworkImage(String imageUrl) {
+    final startTime = DateTime.now();
+    return Image.network(
+      Config.baseUrl + imageUrl,
+      fit: BoxFit.cover,
+      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+        if (loadingProgress == null) {
+          final endTime = DateTime.now();
+          final loadTime = endTime.difference(startTime).inMilliseconds;
+          print('NetworkImage loaded in $loadTime ms');
+          return child;
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+        return Icon(Icons.error);
+      },
     );
   }
 }
