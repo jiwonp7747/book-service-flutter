@@ -1,34 +1,33 @@
+import 'package:book_service_flutter/chat/chat_detail_screen.dart';
+import 'package:book_service_flutter/chat/class/chat_room.dart';
 import 'package:book_service_flutter/config/config.dart';
+import 'package:book_service_flutter/home/class/post.dart';
 import 'package:book_service_flutter/home/widget/book_detail_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
-import 'package:book_service_flutter/home/widget/setting_deal_range.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:book_service_flutter/home/class/post.dart';
+import "dart:convert";
 
-class MarketScreen extends StatefulWidget {
-  const MarketScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
 
   @override
-  State<MarketScreen> createState() => _MarketScreenState();
+  State<ChatScreen> createState() => _ChatScreen();
 }
 
-class _MarketScreenState extends State<MarketScreen> {
-
-  Future<List<Post>> fetchPosts() async {
+class _ChatScreen extends State<ChatScreen> {
+  Future<List<ChatRoom>> fetchChatRooms() async {
     final response = await http.get(
-        Uri.parse('${Config.baseUrl}/api/post/get-list'),
-        headers: <String, String>{
+      Uri.parse('${Config.baseUrl}/api/chat-room/get-list'),
+      headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-          'authorization-token': Config.accessToken,
+        'authorization-token': Config.accessToken,
       },
     );
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-      return jsonResponse.map((post) => Post.fromJson(post)).toList();
+      return jsonResponse.map((chatRoom) => ChatRoom.fromJson(chatRoom)).toList();
     } else {
       throw Exception('Failed to load posts');
     }
@@ -51,7 +50,7 @@ class _MarketScreenState extends State<MarketScreen> {
               height: 8,
             ),
             Text(
-              'BOOKSWAP',
+              '리뷰 게시판',
               style: TextStyle(
                   color: Colors.teal[700],
                   fontSize: 24,
@@ -59,26 +58,7 @@ class _MarketScreenState extends State<MarketScreen> {
             ),
           ],
         ),
-        actions: [
-          GestureDetector(
-            child: Row(
-              children: [
-                Icon(Icons.settings,
-                color: Colors.grey,),
-                Text(" 범위 설정",
-                style: TextStyle(
 
-                ),),
-                SizedBox(width: 16,),
-              ],
-            ),
-            onTap: () async{
-              final resultRange= await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context)=>const SettingDealRange()));
-            },
-          )
-        ],
         toolbarHeight: 80,
       ),
 
@@ -100,8 +80,8 @@ class _MarketScreenState extends State<MarketScreen> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: refreshPosts,
-              child: FutureBuilder<List<Post>>(
-                future: fetchPosts(),
+              child: FutureBuilder<List<ChatRoom>>(
+                future: fetchChatRooms(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -113,46 +93,48 @@ class _MarketScreenState extends State<MarketScreen> {
                     return ListView.builder(
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
-                        final post = snapshot.data![index];
+                        final chatRoom = snapshot.data![index];
                         return SingleChildScrollView(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 16.0),
                             child: GestureDetector(
                               onTap: (){
-                                print("카드가 눌렸습니다."+post.title);
+                                print("카드가 눌렸습니다."+chatRoom.anotherUserNickname);
                                 print("카드가 눌렸습니다. ${Config.accessToken}");
                                 Navigator.push(context,
-                                  MaterialPageRoute(builder: (context)=>BookDetailScreen(post: post,))
+                                    MaterialPageRoute(builder: (context)=>ChatDetailScreen())
                                 );
                               }, //TODO 카드를 눌렀을 때 상세페이지
-                              child: Card( //TODO 카드 사이즈 조절
+                              child: Card(
                                 //color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ), // RoundedRectangleBorder의 닫는 괄호
                                 child: ListTile(
-                                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                   leading: Container(
                                     width: 60,
                                     height: 60,
                                     decoration: BoxDecoration( // 책 이미지
                                       color: Colors.grey[300],
                                       borderRadius: BorderRadius.circular(10),
-                                    ),// BoxDecoration의 닫는 괄호
+                                      image: chatRoom.imageUrl != null && chatRoom.imageUrl.isNotEmpty
+                                          ? DecorationImage(
+                                        image: NetworkImage(Config.baseUrl+chatRoom.imageUrl), // 네트워크에서 이미지를 로드
+                                        fit: BoxFit.cover, // 이미지를 Container의 크기에 맞게 조정
+                                      )
+                                          : null, // 이미지가 없으면 DecorationImage를 null로 설
+                                    ), // BoxDecoration의 닫는 괄호
 
-                                    child: post.imageUrl != null && post.imageUrl.isNotEmpty
-                                        ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: _buildCachedNetworkImage(post.imageUrl),
-                                    )
-                                        : Icon(
+                                    child: chatRoom.imageUrl == null || chatRoom.imageUrl.isEmpty
+                                        ? Icon(
                                       Icons.image,
                                       size: 30,
-                                      color: Colors.grey[700],
-                                    ),
+                                      color: Colors.grey[700], // 기본 아이콘 색상
+                                    )
+                                        : null, // 이미지가 있으면 아이콘을 표시하지 않음
                                   ), // Container의 닫는 괄호
                                   title: Text(
-                                    post.title,
+                                    chatRoom.anotherUserNickname,
                                     style: TextStyle(fontWeight: FontWeight.bold),
                                   ), // Text의 닫는 괄호
                                   subtitle: Column(
@@ -160,12 +142,9 @@ class _MarketScreenState extends State<MarketScreen> {
                                     children: [
                                       //Text(post.title),
                                       //SizedBox(height: 4),
-                                      Text(
-                                        "${post.price.toString()}원",
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                                      ),
+
                                       SizedBox(height: 4),
-                                      Text(post.content),
+                                      Text(chatRoom.anotherUserNickname),
                                     ], // Column의 children 닫는 괄호
                                   ), // subtitle 끝
                                 ), // ListTile의 닫는 괄호
@@ -183,48 +162,28 @@ class _MarketScreenState extends State<MarketScreen> {
         ],
       ),
 
-
       floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'homeTag1',
+        heroTag: "chat1",
         onPressed: () async {
           final result= await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context)=>const SellBookScreen()),
+            context,
+            MaterialPageRoute(builder: (context)=>const SellBookScreen()),
           );
           //글이 성공적으로 등록되었으면
           if(result==true){
-            print("이미지 게시 성공입니다.");
+            print("리뷰글 게시 성공입니다.");
             refreshPosts();
           }
         },
         label: Text('글쓰기',
           style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold
+              color: Colors.white,
+              fontWeight: FontWeight.bold
           ),
         ),
         icon: Icon(Icons.edit, color: Colors.white,),
         backgroundColor: Colors.teal,
       ),
-    );
-  }
-
-  Widget _buildCachedNetworkImage(String imageUrl) {
-    final startTime = DateTime.now();
-    return CachedNetworkImage(
-      imageUrl: Config.baseUrl + imageUrl,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => CircularProgressIndicator(),
-      errorWidget: (context, url, error) => Icon(Icons.error),
-      imageBuilder: (context, imageProvider) {
-        final endTime = DateTime.now();
-        final loadTime = endTime.difference(startTime).inMilliseconds;
-        print('CachedNetworkImage loaded in $loadTime ms');
-        return Image(
-          image: imageProvider,
-          fit: BoxFit.cover,
-        );
-      },
     );
   }
 }

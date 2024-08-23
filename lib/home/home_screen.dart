@@ -1,3 +1,4 @@
+import 'package:book_service_flutter/chat/chat_screen.dart';
 import 'package:book_service_flutter/login/login_service.dart';
 import 'package:book_service_flutter/home/widget/market_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
@@ -29,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _menuIndex,
         children: [
           MarketScreen(),
-          SellBookScreen(),
+          ChatScreen(),
           ReviewBoardScreen(),
           LoginService(),
           UserProfileScreen(),
