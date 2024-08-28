@@ -102,7 +102,7 @@ class _ChatScreen extends State<ChatScreen> {
                                 print("카드가 눌렸습니다."+chatRoom.anotherUserNickname);
                                 print("카드가 눌렸습니다. ${Config.accessToken}");
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context)=>ChatDetailScreen())
+                                    MaterialPageRoute(builder: (context)=>ChatDetailScreen(chatRoomId: chatRoom.id, chatRoom: chatRoom,))
                                 );
                               }, //TODO 카드를 눌렀을 때 상세페이지
                               child: Card(

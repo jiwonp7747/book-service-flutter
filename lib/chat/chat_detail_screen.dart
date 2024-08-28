@@ -1,7 +1,14 @@
+import 'package:book_service_flutter/chat/class/chat_room.dart';
+import 'package:book_service_flutter/config/config.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ChatDetailScreen extends StatefulWidget {
-  const ChatDetailScreen({super.key});
+  final int chatRoomId;
+  final ChatRoom chatRoom;
+
+  const ChatDetailScreen({super.key, required this.chatRoomId, required this.chatRoom});
 
   @override
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
@@ -9,11 +16,82 @@ class ChatDetailScreen extends StatefulWidget {
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, dynamic>> messages = [
-    {'text': '안녕하세요.', 'isMe': false, 'time': '오전 11:26'},
-    {'text': '안녕하세요', 'isMe': true, 'time': '오전 11:26'},
-  ];
-  int messageCount=2;
+  List<Map<String, dynamic>> messages = [];
+  int messageCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMessages(); // 화면이 로드될 때 메시지를 가져오는 함수 호출
+  }
+
+  Future<void> _fetchMessages() async {
+    try {
+      var uri = Uri.parse('${Config.baseUrl}/api/chat-message/get-list?chat-room-id=${widget.chatRoomId}');
+      var response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'authorization-token': Config.accessToken,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          messages = jsonResponse.map((message) => {
+            'text': message['content'],
+            'isMe': message['is_me'], // 이 부분은 서버 응답에 따라 달라질 수 있습니다.
+            'time': message['registered_at'],
+          }).toList();
+          messageCount = messages.length;
+        });
+      } else {
+        throw Exception('Failed to load messages');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch messages: $e')),
+      );
+    }
+  }
+
+  Future<void> _sendMessage(String message) async {
+    try {
+      var uri = Uri.parse('${Config.baseUrl}/api/chat-message/register');
+      var body = jsonEncode({
+        'content': message,
+        'chat_room_id': widget.chatRoomId,
+      });
+
+      var response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'authorization-token': Config.accessToken,
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          messages.insert(messageCount, {
+            'text': message,
+            'isMe': true,
+            'time': '방금',
+          });
+          messageCount++;
+        });
+        _messageController.clear();
+      } else {
+        throw Exception('Failed to send message');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send message: $e')),
+      );
+    }
+  }
 
   Widget _buildMessage(Map<String, dynamic> message) {
     bool isMe = message['isMe'];
@@ -65,7 +143,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               CircleAvatar(
                 radius: 15,
                 backgroundColor: Colors.grey[300],
-                child: Icon(Icons.person, size: 15, color: Colors.white,),
+                child: Icon(Icons.person, size: 15, color: Colors.white),
               ),
           ],
         ),
@@ -97,23 +175,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(12),
-                    ),
-                    /*child: post.imageUrl != null && post.imageUrl.isNotEmpty
-                        ? ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: _buildCachedNetworkImage(post.imageUrl),
-                    )
-                        : Icon(
-                      Icons.image,
-                      size: 30,
-                      color: Colors.grey[700],
-                    ),*/
+                      image: widget.chatRoom.imageUrl != null && widget.chatRoom.imageUrl.isNotEmpty
+                          ? DecorationImage(
+                        image: NetworkImage(Config.baseUrl+widget.chatRoom.imageUrl), // 네트워크에서 이미지를 로드
+                        fit: BoxFit.cover, // 이미지를 Container의 크기에 맞게 조정
+                    ):null,
+                  ),
                   ),
                   SizedBox(width: 20,),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("닉네임",),
+                      Text(widget.chatRoom.anotherUserNickname,),
                       Text("책 제목제목제목",),
                       Text("10,000원",),
                     ],
@@ -155,16 +228,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       child: IconButton(
                         icon: Icon(Icons.send, color: Colors.white),
                         onPressed: () {
-                          // 메시지 전송 로직 추가
-                          setState(() {
-                            messages.insert(messageCount, {
-                              'text': _messageController.text,
-                              'isMe': true,
-                              'time': '오전 11:27',
-                            });
-                            messageCount++;
-                            _messageController.clear();
-                          });
+                          if (_messageController.text.trim().isNotEmpty) {
+                            _sendMessage(_messageController.text.trim());
+                          }
                         },
                       ),
                     ),
@@ -178,3 +244,4 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     );
   }
 }
+
