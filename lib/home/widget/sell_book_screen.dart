@@ -54,7 +54,7 @@ class _SellBookScreenState extends State<SellBookScreen> {
        request.fields['title']=title;
        request.fields['price']=price;
        request.fields['content']=content;
-       request.fields['userId']="1"; //TODO 실제 userId로 변경 필요
+       // request.fields['userId']="1"; //TODO 실제 userId로 변경 필요
 
        // 요청 전송
        var response=await request.send();
@@ -210,7 +210,7 @@ class _SellBookScreenState extends State<SellBookScreen> {
                       ElevatedButton(
                         onPressed: registerPost,
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
+                            backgroundColor: Color(0xFF53787E),
                             minimumSize: Size(double.infinity, 48)),
                         child: const Text(
                           "게시하기",

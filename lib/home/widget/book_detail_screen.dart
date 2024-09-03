@@ -1,6 +1,7 @@
 import 'package:book_service_flutter/chat/chat_detail_screen.dart';
 import 'package:book_service_flutter/config/config.dart';
 import 'package:book_service_flutter/home/class/post.dart';
+import 'package:book_service_flutter/home/widget/exchange_request.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -142,6 +143,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 height: 24,
               ),
 
+              Divider(),
+              Text("교환 제안", style: TextStyle(
+                fontWeight: FontWeight.bold
+              ),),
             ],
           ),
         ),
@@ -158,8 +163,31 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 },
                 icon: Icon(
                   heartSelected==0 ? Icons.favorite_border : Icons.favorite
-                  , color: Colors.teal,
+                  , color: Color(0xFF53787E),
                 )
+            ),
+            SizedBox(width: 8,),
+            Expanded(
+              child: ElevatedButton(
+                  onPressed: () { // TODO 교환 요청
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context)=>ExchangeRequest(post: widget.post,))
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    backgroundColor: Color(0xFF53787E),
+                    minimumSize: Size(double.infinity, 48),
+                  ),
+                  child: Text("교환요청",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+              ),
             ),
             SizedBox(width: 8,),
             Expanded(
@@ -171,7 +199,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color(0xFF53787E),
                     minimumSize: Size(double.infinity, 48),
                   ),
                   child: Text("채팅하기",
@@ -181,7 +209,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     ),
                   )
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -2,8 +2,10 @@ import 'package:book_service_flutter/config/config.dart';
 import 'package:book_service_flutter/home/widget/book_detail_screen.dart';
 import 'package:book_service_flutter/home/widget/sell_book_screen.dart';
 import 'package:book_service_flutter/home/widget/setting_deal_range.dart';
+import 'package:book_service_flutter/map/naver_map.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:book_service_flutter/home/class/post.dart';
@@ -53,7 +55,7 @@ class _MarketScreenState extends State<MarketScreen> {
             Text(
               'BOOKSWAP',
               style: TextStyle(
-                  color: Colors.teal[700],
+                  color: Color(0xFF53787E),
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
@@ -73,9 +75,10 @@ class _MarketScreenState extends State<MarketScreen> {
               ],
             ),
             onTap: () async{
+              await initialize();
               final resultRange= await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context)=>const SettingDealRange()));
+                  MaterialPageRoute(builder: (context)=>const NaverMap()));
             },
           )
         ],
@@ -197,14 +200,14 @@ class _MarketScreenState extends State<MarketScreen> {
             refreshPosts();
           }
         },
-        label: Text('글쓰기',
+        label: Text('책 등록',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold
           ),
         ),
         icon: Icon(Icons.edit, color: Colors.white,),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF53787E),
       ),
     );
   }

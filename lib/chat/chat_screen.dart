@@ -50,9 +50,9 @@ class _ChatScreen extends State<ChatScreen> {
               height: 8,
             ),
             Text(
-              '리뷰 게시판',
+              '채팅',
               style: TextStyle(
-                  color: Colors.teal[700],
+                  color: Color(0xFF53787E),
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
@@ -162,28 +162,6 @@ class _ChatScreen extends State<ChatScreen> {
         ],
       ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: "chat1",
-        onPressed: () async {
-          final result= await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context)=>const SellBookScreen()),
-          );
-          //글이 성공적으로 등록되었으면
-          if(result==true){
-            print("리뷰글 게시 성공입니다.");
-            refreshPosts();
-          }
-        },
-        label: Text('글쓰기',
-          style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-          ),
-        ),
-        icon: Icon(Icons.edit, color: Colors.white,),
-        backgroundColor: Colors.teal,
-      ),
     );
   }
 }

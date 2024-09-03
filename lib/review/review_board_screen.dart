@@ -51,7 +51,7 @@ class _ReviewBoardScreenState extends State<ReviewBoardScreen> {
             Text(
               '리뷰 게시판',
               style: TextStyle(
-                  color: Colors.teal[700],
+                  color: Color(0xFF53787E),
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
@@ -178,7 +178,7 @@ class _ReviewBoardScreenState extends State<ReviewBoardScreen> {
           ),
         ),
         icon: Icon(Icons.edit, color: Colors.white,),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF53787E),
       ),
     );
   }
