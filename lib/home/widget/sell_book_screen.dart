@@ -31,7 +31,7 @@ class _SellBookScreenState extends State<SellBookScreen> {
       final String content = contentController.text;
 
       try {
-       var uri=Uri.parse('${Config.baseUrl}/api/post/register');
+       var uri=Uri.parse('${Config.baseUrl}/api/post');
        var request=http.MultipartRequest('Post', uri);
 
        // 요청 헤더 추가
@@ -50,7 +50,6 @@ class _SellBookScreenState extends State<SellBookScreen> {
        }
 
        // 텍스트 필드 추가
-       request.fields['postType']="PURCHASE";
        request.fields['title']=title;
        request.fields['price']=price;
        request.fields['content']=content;

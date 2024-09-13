@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../../chat/class/chat_room.dart';
+
 class BookDetailScreen extends StatefulWidget {
   final Post post;
 
@@ -18,8 +20,8 @@ class BookDetailScreen extends StatefulWidget {
 class _BookDetailScreenState extends State<BookDetailScreen> {
   int heartSelected=0;
 
-  Future<void> registerChatRoom() async { // 채팅하기 버튼 누를 시 채팅방 만들기
-
+  // 채팅방 생성
+  Future<ChatRoom?> registerChatRoom() async {
     try {
       var uri=Uri.parse('${Config.baseUrl}/api/chat-room');
       // JSON 데이터 준비
@@ -39,27 +41,35 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
       if (response.statusCode == 200) {
 
-        var responseData=jsonDecode(response.body);
-        var chatRoomId=responseData['id'];
+        var responseData=jsonDecode(utf8.decode(response.bodyBytes));
+        ChatRoom chatRoom=ChatRoom.fromJson(responseData);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('채팅방이 성공적으로 등록되었습니다.')),
         );
-        /*Navigator.push(context,
-            MaterialPageRoute(builder: (context)=>ChatDetailScreen(chatRoomId: chatRoomId, ,))
-        );*/
+        return chatRoom;
+
       } else {
         // 오류 처리
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('채팅방 등록에 실패하였습니다.')),
         );
+        return null;
       }
     } catch (e) {
       // 네트워크 또는 기타 오류 처리
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('오류 발생: $e')),
       );
+      return null;
     }
+  }
+  // 채팅 방 들어가기
+  void enterChatRoom(ChatRoom chatRoom) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context)=>ChatDetailScreen(chatRoom: chatRoom))
+    );
+    print("enterChatRoom#####");
   }
 
   @override
@@ -91,7 +101,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   SizedBox(width: 6,),
                   Column(
                     children: [
-                      Text("닉네임",
+                      Text(widget.post.nickname,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -108,6 +118,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 width: double.infinity,
                 height: 400,
                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
                     image: DecorationImage(
                   image: NetworkImage(
                       Config.baseUrl + widget.post.imageUrl),
@@ -143,10 +154,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 height: 24,
               ),
 
-              Divider(),
-              Text("교환 제안", style: TextStyle(
-                fontWeight: FontWeight.bold
-              ),),
             ],
           ),
         ),
@@ -192,8 +199,12 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             SizedBox(width: 8,),
             Expanded(
               child: ElevatedButton(
-                  onPressed: () { // 채팅방 등록 및 이동
-                    registerChatRoom();
+                  onPressed: () async{ // 채팅방 등록 및 이동
+                    ChatRoom? chatRoom=await registerChatRoom();
+                    //TODO chatRoom 이동 코드
+                    if(chatRoom!=null){
+                      enterChatRoom(chatRoom);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -215,4 +226,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       ),
     );
   }
+
+
 }

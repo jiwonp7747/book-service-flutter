@@ -3,12 +3,12 @@ import 'package:book_service_flutter/config/config.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class ChatDetailScreen extends StatefulWidget {
-  final int chatRoomId;
   final ChatRoom chatRoom;
 
-  const ChatDetailScreen({super.key, required this.chatRoomId, required this.chatRoom});
+  const ChatDetailScreen({super.key, required this.chatRoom});
 
   @override
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
@@ -27,7 +27,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
   Future<void> _fetchMessages() async {
     try {
-      var uri = Uri.parse('${Config.baseUrl}/api/chat-message/get-list?chat-room-id=${widget.chatRoomId}');
+      var uri = Uri.parse('${Config.baseUrl}/api/chat-message/get-list?chat-room-id=${widget.chatRoom.id}');
       var response = await http.get(
         uri,
         headers: {
@@ -61,7 +61,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       var uri = Uri.parse('${Config.baseUrl}/api/chat-message/register');
       var body = jsonEncode({
         'content': message,
-        'chat_room_id': widget.chatRoomId,
+        'chat_room_id': widget.chatRoom.id,
       });
 
       var response = await http.post(
@@ -129,7 +129,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    message['time'],
+                    _formatTime(message['time']),
                     style: TextStyle(
                       color: isMe ? Colors.grey : Colors.white60,
                       fontSize: 12,
@@ -149,6 +149,19 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         ),
       ),
     );
+  }
+
+  String _formatTime(String time) {
+    try {
+      // 서버에서 받은 시간 데이터를 DateTime으로 변환
+      DateTime dateTime = DateTime.parse(time);
+
+      // 원하는 형식으로 포맷팅
+      return DateFormat('aa hh:mm', 'ko_KR').format(dateTime); // 원하는 포맷으로 수정 가능
+    } catch (e) {
+      // 에러 발생 시 원래 시간 문자열 반환
+      return time;
+    }
   }
 
   @override

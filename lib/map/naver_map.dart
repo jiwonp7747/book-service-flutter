@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:book_service_flutter/config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 
@@ -8,7 +9,7 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 Future<void> initialize() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NaverMapSdk.instance.initialize(
-      clientId: '6w95jw58e9',     // 클라이언트 ID 설정
+      clientId: Config.key,     // 클라이언트 ID 설정
       onAuthFailed: (e) => log("네이버맵 인증오류 : $e", name: "onAuthFailed")
   );
 }
@@ -21,18 +22,35 @@ class NaverMapApp extends StatelessWidget {
     // NaverMapController 객체의 비동기 작업 완료를 나타내는 Completer 생성
     final Completer<NaverMapController> mapControllerCompleter = Completer();
 
-    return MaterialApp(
-      home: Scaffold(
-        body: NaverMap(
-          options: const NaverMapViewOptions(
-            indoorEnable: true,             // 실내 맵 사용 가능 여부 설정
-            locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
-            consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
-          ),
-          onMapReady: (controller) async {                // 지도 준비 완료 시 호출되는 콜백 함수
-            mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
-            log("onMapReady", name: "onMapReady");
-          },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back)),
+        ),
+        body: Column(
+          children: [
+            SizedBox(
+              height: 500,
+              width: 500,
+              child: NaverMap(
+                options: const NaverMapViewOptions(
+                  indoorEnable: true,             // 실내 맵 사용 가능 여부 설정
+                  locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
+                  consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
+                ),
+                onMapReady: (controller) async {                // 지도 준비 완료 시 호출되는 콜백 함수
+                  mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
+                  log("onMapReady", name: "onMapReady");
+                },
+              ),
+            ),
+            SizedBox(height: 20,),
+            Text("다른 위젯")
+          ],
         ),
       ),
     );

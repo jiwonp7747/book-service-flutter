@@ -1,4 +1,5 @@
 import 'package:book_service_flutter/profile/setting_user_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,8 @@ class UserProfileScreen extends StatefulWidget {
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
-class _UserProfileScreenState extends State<UserProfileScreen> with SingleTickerProviderStateMixin {
+class _UserProfileScreenState extends State<UserProfileScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -40,10 +42,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
       if (response.statusCode == 200) {
         return jsonDecode(utf8.decode(response.bodyBytes));
       } else {
-        throw Exception('Failed to load profile data');
+        throw Exception('프로필 요청 오류 catch');
       }
     } catch (e) {
-      throw Exception('Failed to load profile data');
+      throw Exception('프로필 요청 중 오류 catch ');
     }
   }
 
@@ -73,7 +75,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
     return Image.network(
       Config.baseUrl + imageUrl,
       fit: BoxFit.cover,
-      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+      loadingBuilder: (BuildContext context, Widget child,
+          ImageChunkEvent? loadingProgress) {
         if (loadingProgress == null) {
           final endTime = DateTime.now();
           final loadTime = endTime.difference(startTime).inMilliseconds;
@@ -85,7 +88,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
           );
         }
       },
-      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+      errorBuilder:
+          (BuildContext context, Object exception, StackTrace? stackTrace) {
         return Icon(Icons.error);
       },
     );
@@ -130,7 +134,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.grey[200],
-                          backgroundImage: const AssetImage('assets/images/img.png'),
+                          backgroundImage:
+                              const AssetImage('assets/images/img.png'),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -145,7 +150,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              const Text('0 포인트', style: TextStyle(color: Colors.grey)),
+                              const Text('0 포인트',
+                                  style: TextStyle(color: Colors.grey)),
                             ],
                           ),
                         ),
@@ -172,6 +178,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
               child: TabBarView(
                 controller: _tabController,
                 children: [
+                  // children 순으로 1, 2, 3  control
                   FutureBuilder<List<dynamic>>(
                     future: _fetchUserPosts(),
                     builder: (context, snapshot) {
@@ -183,7 +190,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
                         final posts = snapshot.data!;
                         return GridView.builder(
                           padding: const EdgeInsets.all(16.0),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             crossAxisSpacing: 8.0,
                             mainAxisSpacing: 8.0,
@@ -191,27 +199,38 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
                           ),
                           itemCount: posts.length,
                           itemBuilder: (context, index) {
-                            final post = posts[index] as Map<String, dynamic>; // 타입 캐스팅
+                            final post =
+                                posts[index] as Map<String, dynamic>; // 타입 캐스팅
                             return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Container(
                                   height: 100,
-                                  decoration: BoxDecoration( // 책 이미지
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    // 책 이미지
                                     color: Colors.grey[300],
                                     borderRadius: BorderRadius.circular(10),
                                   ), // BoxDecoration의 닫는 괄호
-
-                                  child: post['image_url'] != null && post['image_url'].isNotEmpty
-                                      ? _buildNetworkImage(post['image_url'])
+                                  child: post['image_url'] != null ||
+                                          post['image_url'].isNotEmpty
+                                      ? CachedNetworkImage(
+                                          imageUrl: Config.baseUrl +
+                                              post['image_url'],
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
+                                        )
                                       : Icon(
-                                    Icons.image,
-                                    size: 30,
-                                    color: Colors.grey[700],
-                                  ),
+                                          Icons.image,
+                                          size: 30,
+                                          color: Colors.grey[700],
+                                        ),
                                 ),
                                 const SizedBox(height: 8),
-                                 //Text(post['image_url'] ?? 'Unknown Date'),
+                                //Text(post['image_url'] ?? 'Unknown Date'),
                                 Text(post['title'] ?? 'Unknown Title'),
                                 Text("${post['price'] ?? 'Unknown Price'}원"),
                               ],
@@ -223,7 +242,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
                       }
                     },
                   ),
-                  const Center(child: Text('구매 내역')),
+                  Column(
+                    children: [
+                      Text('리뷰 게시글'),
+                      Text('리뷰 게시글'),
+                    ],
+                  ),
                   const Center(child: Text('리뷰 게시글')),
                 ],
               ),
@@ -234,4 +258,3 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
     );
   }
 }
-
